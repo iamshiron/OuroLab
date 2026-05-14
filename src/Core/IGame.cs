@@ -4,6 +4,7 @@ public interface IGame {
     string Name { get; }
     int Rows { get; }
     int Columns { get; }
+    int MaxClicks { get; }
     IValueConverter ValueConverter { get; }
 
     void NewGame();
@@ -21,4 +22,7 @@ public interface IGame {
     bool GoalAchieved { get; }
     bool ConsumeClick(int index);
     int TheoreticalMaxScore { get; }
+
+    IGame Fork();
+    void ApplyHypothetical(int index, Sphere sphere);
 }

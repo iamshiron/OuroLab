@@ -15,6 +15,7 @@ public sealed class OuroChestGame : IGame {
     public string Name => "Ouro Chest";
     public int Rows { get; }
     public int Columns { get; }
+    public int MaxClicks => _maxClicks;
     public IValueConverter ValueConverter => _valueConverter;
     public bool IsSolved => _clicksConsumed >= _maxClicks;
     public int RevealedCount => _revealedCount;
@@ -126,6 +127,27 @@ public sealed class OuroChestGame : IGame {
     public bool ConsumeClick(int index) => true;
 
     public Sphere PeekSphere(int row, int col) => _board[row, col];
+
+    public IGame Fork() => new OuroChestGame(this);
+
+    public void ApplyHypothetical(int index, Sphere sphere) {
+        _revealed[index] = true;
+        _board[index] = sphere;
+        _revealedCount++;
+        _clicksConsumed++;
+    }
+
+    private OuroChestGame(OuroChestGame other) {
+        Rows = other.Rows;
+        Columns = other.Columns;
+        _maxClicks = other._maxClicks;
+        _random = other._random;
+        _valueConverter = other._valueConverter;
+        _board = Board.FromArray(other._board.ToArray(), other.Rows, other.Columns);
+        _revealed = (bool[]) other._revealed.Clone();
+        _revealedCount = other._revealedCount;
+        _clicksConsumed = other._clicksConsumed;
+    }
 
     private Board GenerateBoard() {
         var board = new Board(Rows, Columns);
