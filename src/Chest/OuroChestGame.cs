@@ -19,6 +19,7 @@ public sealed class OuroChestGame : IGame {
     public bool IsSolved => _clicksConsumed >= _maxClicks;
     public int RevealedCount => _revealedCount;
     public string? GoalDescription => "Find Red";
+    public Sphere? GoalSphere => Sphere.Red;
     public bool GoalAchieved => GoalDescription is not null && _revealed.Any(r => r) && WasSphereRevealed(Sphere.Red);
 
     public int TheoreticalMaxScore {
@@ -64,15 +65,16 @@ public sealed class OuroChestGame : IGame {
         _clicksConsumed = 0;
     }
 
-    public IReadOnlySet<Sphere> GetPossibleSpheres(int index) {
+    public IReadOnlyDictionary<Sphere, double> GetPossibleSpheres(int index) {
         ValidateIndex(index);
 
         if (_revealed[index])
-            return new HashSet<Sphere> { _board[index] };
+            return new Dictionary<Sphere, double> { { _board[index], 1.0 } };
 
-        var possible = new HashSet<Sphere>();
+        var counts = new Dictionary<Sphere, int>();
         var size = Rows * Columns;
         var center = Rows / 2 * Columns + Columns / 2;
+        var total = 0;
 
         for (var rp = 0; rp < size; rp++) {
             if (rp == center) continue;
@@ -80,25 +82,21 @@ public sealed class OuroChestGame : IGame {
 
             var (row, col) = _board.ToPosition(index);
             var (redRow, redCol) = _board.ToPosition(rp);
+            var sphere = ClassifyCell(row, col, redRow, redCol, rp == index);
 
-            if (index == rp) {
-                possible.Add(Sphere.Red);
-            } else if (IsCardinallyAdjacent(row, col, redRow, redCol)) {
-                possible.Add(Sphere.Orange);
-                possible.Add(Sphere.Green);
-                possible.Add(Sphere.Teal);
-            } else if (IsDiagonal(row, col, redRow, redCol)) {
-                possible.Add(Sphere.Yellow);
-                possible.Add(Sphere.Teal);
-            } else if (IsInSameRowOrColumn(row, col, redRow, redCol)) {
-                possible.Add(Sphere.Green);
-                possible.Add(Sphere.Teal);
-            } else {
-                possible.Add(Sphere.Blue);
-            }
+            counts.TryGetValue(sphere, out var c);
+            counts[sphere] = c + 1;
+            total++;
         }
 
-        return possible;
+        if (total == 0)
+            return new Dictionary<Sphere, double>();
+
+        var result = new Dictionary<Sphere, double>(counts.Count);
+        foreach (var (sphere, count) in counts)
+            result[sphere] = (double) count / total;
+
+        return result;
     }
 
     public Sphere Reveal(int index) {
@@ -126,6 +124,8 @@ public sealed class OuroChestGame : IGame {
     }
 
     public bool ConsumeClick(int index) => true;
+
+    public Sphere PeekSphere(int row, int col) => _board[row, col];
 
     private Board GenerateBoard() {
         var board = new Board(Rows, Columns);
@@ -253,6 +253,14 @@ public sealed class OuroChestGame : IGame {
 
     private static bool IsInLine(int r1, int c1, int r2, int c2)
         => r1 == r2 || c1 == c2 || Math.Abs(r1 - r2) == Math.Abs(c1 - c2);
+
+    private static Sphere ClassifyCell(int row, int col, int redRow, int redCol, bool isRedPos)
+        => isRedPos ? Sphere.Red
+           : IsCardinallyAdjacent(row, col, redRow, redCol) ? Sphere.Orange
+           : IsDiagonal(row, col, redRow, redCol) ? Sphere.Yellow
+           : IsInSameRowOrColumn(row, col, redRow, redCol) ? Sphere.Green
+           : IsInLine(row, col, redRow, redCol) ? Sphere.Teal
+           : Sphere.Blue;
 
     private void Shuffle<T>(List<T> list) {
         for (var i = list.Count - 1; i > 0; i--) {

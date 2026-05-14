@@ -7,7 +7,7 @@ public interface IGame {
     IValueConverter ValueConverter { get; }
 
     void NewGame();
-    IReadOnlySet<Sphere> GetPossibleSpheres(int index);
+    IReadOnlyDictionary<Sphere, double> GetPossibleSpheres(int index);
     Sphere Reveal(int index);
     bool IsRevealed(int index);
     Sphere GetRevealedSphere(int index);
@@ -17,6 +17,7 @@ public interface IGame {
     int RevealedCount { get; }
 
     string? GoalDescription { get; }
+    Sphere? GoalSphere { get; }
     bool GoalAchieved { get; }
     bool ConsumeClick(int index);
     int TheoreticalMaxScore { get; }

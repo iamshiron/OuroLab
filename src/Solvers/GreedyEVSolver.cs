@@ -21,9 +21,8 @@ public sealed class GreedyEVSolver : ISolver {
                 if (possible.Count == 0) continue;
 
                 var ev = 0.0;
-                foreach (var s in possible)
-                    ev += game.ValueConverter.GetValue(s);
-                ev /= possible.Count;
+                foreach (var (s, prob) in possible)
+                    ev += prob * game.ValueConverter.GetValue(s);
 
                 if (ev > bestEV) {
                     bestEV = ev;
