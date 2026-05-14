@@ -1,41 +1,68 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace Shiron.OuroLab.Core;
 
 public sealed class Benchmark {
     public required Func<IGame> GameFactory { get; init; }
-    public required ISolver Solver { get; init; }
+    public required Func<ISolver> SolverFactory { get; init; }
     public required int Iterations { get; init; }
+    public int MaxDegreeOfParallelism { get; init; } = 1;
 
     public BenchmarkResult Run() {
         var results = new SolverResult[Iterations];
-        var timings = new TimeSpan[Iterations];
+        var gameNames = new ConcurrentBag<string>();
         var totalSw = Stopwatch.StartNew();
 
-        string? gameName = null;
+        var options = new ParallelOptions {
+            MaxDegreeOfParallelism = MaxDegreeOfParallelism,
+        };
 
-        for (var i = 0; i < Iterations; i++) {
+        Parallel.For(0, Iterations, options, i => {
             var game = GameFactory();
             game.NewGame();
-            gameName ??= game.Name;
+            gameNames.Add(game.Name);
 
             var sw = Stopwatch.StartNew();
-            var result = Solver.Solve(game);
+            var result = SolverFactory().Solve(game);
             sw.Stop();
 
-            results[i] = result with { Elapsed = sw.Elapsed };
-        }
+            var goalHit = game.GoalDescription is not null ? game.GoalAchieved : (bool?) null;
+            var maxScore = game.TheoreticalMaxScore;
+            results[i] = result with {
+                Elapsed = sw.Elapsed,
+                GoalHit = goalHit,
+                TheoreticalMaxScore = maxScore,
+            };
+        });
 
         totalSw.Stop();
 
+        var hasGoal = results.Any(r => r.GoalHit.HasValue);
+        var goalHitRate = hasGoal
+            ? results.Count(r => r.GoalHit == true) / (double) results.Length * 100.0
+            : (double?) null;
+
+        var bestResult = results.Length > 0 ? results.MaxBy(r => r.Score) : null;
+        var efficiencies = results
+            .Where(r => r.TheoreticalMaxScore > 0)
+            .Select(r => (double) r.Score / r.TheoreticalMaxScore!.Value * 100.0)
+            .ToList();
+
         return new BenchmarkResult(
-            SolverName: Solver.Name,
-            GameName: gameName ?? "Unknown",
+            SolverName: SolverFactory().Name,
+            GameName: gameNames.FirstOrDefault() ?? "Unknown",
             Iterations: Iterations,
             AverageScore: results.Length > 0 ? results.Average(r => r.Score) : 0,
+            AverageEfficiency: efficiencies.Count > 0 ? efficiencies.Average() : 0,
+            BestScore: bestResult?.Score ?? 0,
+            BestEfficiency: bestResult is not null && bestResult.TheoreticalMaxScore > 0
+                ? (double) bestResult.Score / bestResult.TheoreticalMaxScore.Value * 100.0
+                : 0,
             AverageReveals: results.Length > 0 ? results.Average(r => r.Reveals) : 0,
-            AverageTime: timings.Length > 0
-                ? TimeSpan.FromTicks((long) results.Average(r => r.Elapsed.Ticks))
+            GoalHitRate: goalHitRate,
+            AverageTime: results.Length > 0
+                ? TimeSpan.FromTicks((long) results.Average(r => (double) r.Elapsed.Ticks))
                 : TimeSpan.Zero,
             TotalTime: totalSw.Elapsed,
             Results: results.AsReadOnly()

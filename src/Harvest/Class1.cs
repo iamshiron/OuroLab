@@ -1,6 +1,5 @@
-﻿namespace Shiron.OuroLab.Harvest;
+namespace Shiron.OuroLab.Harvest;
 
-public class Class1
-{
+public class Class1 {
 
 }

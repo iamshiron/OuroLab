@@ -1,5 +1,11 @@
+using Shiron.OuroLab.Chest;
+using Shiron.OuroLab.Cli;
 using Shiron.OuroLab.Cli.Commands;
+using Shiron.OuroLab.Solvers;
 using Spectre.Console.Cli;
+
+Registry.RegisterGame("ouro-chest", () => new OuroChestGame(), "greedy-ev");
+Registry.RegisterSolver("greedy-ev", () => new GreedyEVSolver());
 
 var app = new CommandApp();
 app.Configure(c => {

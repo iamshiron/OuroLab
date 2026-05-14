@@ -15,4 +15,9 @@ public interface IGame {
     bool IsSolved { get; }
     int Score { get; }
     int RevealedCount { get; }
+
+    string? GoalDescription { get; }
+    bool GoalAchieved { get; }
+    bool ConsumeClick(int index);
+    int TheoreticalMaxScore { get; }
 }

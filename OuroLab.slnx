@@ -1,7 +1,9 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Cli/Shiron.OuroLab.Cli.csproj" />
+    <Project Path="src/Chest/Shiron.OuroLab.Chest.csproj" />
     <Project Path="src/Core/Shiron.OuroLab.Core.csproj" />
     <Project Path="src/Harvest/Shiron.OuroLab.Harvest.csproj" />
+    <Project Path="src/Solvers/Shiron.OuroLab.Solvers.csproj" />
   </Folder>
 </Solution>

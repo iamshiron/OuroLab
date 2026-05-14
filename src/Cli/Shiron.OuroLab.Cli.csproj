@@ -8,8 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Chest\Shiron.OuroLab.Chest.csproj" />
     <ProjectReference Include="..\Core\Shiron.OuroLab.Core.csproj" />
     <ProjectReference Include="..\Harvest\Shiron.OuroLab.Harvest.csproj" />
+    <ProjectReference Include="..\Solvers\Shiron.OuroLab.Solvers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
