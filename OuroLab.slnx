@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Cli/Shiron.OuroLab.Cli.csproj" />
+    <Project Path="src/Core/Shiron.OuroLab.Core.csproj" />
+    <Project Path="src/Harvest/Shiron.OuroLab.Harvest.csproj" />
+  </Folder>
+</Solution>
