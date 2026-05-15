@@ -1,6 +1,7 @@
 using Shiron.OuroLab.Core;
 using Shiron.OuroLab.Chest;
 using Shiron.OuroLab.Cli;
+using Shiron.OuroLab.Quest;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -21,8 +22,12 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings> {
         if (gameName is null) return Task.FromResult(1);
 
         var game = Registry.Games[gameName]();
-        if (settings.Seed.HasValue && game is OuroChestGame)
-            game = new OuroChestGame(seed: settings.Seed.Value);
+        if (settings.Seed.HasValue) {
+            if (game is OuroChestGame)
+                game = new OuroChestGame(seed: settings.Seed.Value);
+            else if (game is OuroQuestGame)
+                game = new OuroQuestGame(seed: settings.Seed.Value);
+        }
 
         game.NewGame();
         RenderBoard(game);
@@ -58,10 +63,8 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings> {
     };
 
     private static void RenderBoard(IGame game) {
-        var chest = (OuroChestGame) game;
         var converter = game.ValueConverter;
 
-        var panel = new Panel("".ToString());
         var grid = new Grid();
 
         for (var col = 0; col <= game.Columns; col++)
@@ -75,7 +78,11 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings> {
         for (var row = 0; row < game.Rows; row++) {
             var cells = new List<string> { $"[grey]{row}[/]" };
             for (var col = 0; col < game.Columns; col++) {
-                var sphere = chest.PeekSphere(row, col);
+                var sphere = game switch {
+                    OuroChestGame chest => chest.PeekSphere(row, col),
+                    OuroQuestGame quest => quest.PeekSphere(row, col),
+                    _ => Sphere.Purple,
+                };
                 var name = sphere.ToString();
                 var color = SphereColors.GetValueOrDefault(sphere, "white");
                 var value = converter.UsedSpheres.Contains(sphere) ? converter.GetValue(sphere) : 0;

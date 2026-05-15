@@ -1,10 +1,12 @@
 using Shiron.OuroLab.Chest;
 using Shiron.OuroLab.Cli;
 using Shiron.OuroLab.Cli.Commands;
+using Shiron.OuroLab.Quest;
 using Shiron.OuroLab.Solvers;
 using Spectre.Console.Cli;
 
 Registry.RegisterGame("ouro-chest", () => new OuroChestGame(), "greedy-ev", "goal-hunter", "info-gain", "random", "expectimax", "cached-expectimax");
+Registry.RegisterGame("ouro-quest", () => new OuroQuestGame(), "greedy-ev", "goal-hunter", "info-gain", "random", "expectimax", "cached-expectimax");
 Registry.RegisterSolver("greedy-ev", () => new GreedyEVSolver());
 Registry.RegisterSolver("goal-hunter", () => new GoalHunterSolver());
 Registry.RegisterSolver("info-gain", () => new InfoGainSolver());

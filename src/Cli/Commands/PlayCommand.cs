@@ -113,11 +113,15 @@ internal sealed class PlayCommand : AsyncCommand<PlayCommand.Settings> {
             var cells = new List<string> { $"[bold grey]{row}[/]" };
             for (var col = 0; col < game.Columns; col++) {
                 var index = row * game.Columns + col;
-                if (game.IsRevealed(index)) {
+                if (game.IsVisible(index)) {
                     var sphere = game.GetRevealedSphere(index);
                     var value = game.ValueConverter.GetValue(sphere);
                     var color = SphereColors.GetValueOrDefault(sphere, "white");
-                    cells.Add($"[{color} bold]{sphere}[/]\n[grey]{value}pts[/]");
+                    if (game.IsRevealed(index)) {
+                        cells.Add($"[{color} bold]{sphere}[/]\n[grey]{value}pts[/]");
+                    } else {
+                        cells.Add($"[{color} bold]{sphere}[/]\n[grey]{value}pts ★[/]");
+                    }
                 } else {
                     cells.Add("[grey dim]???[/]");
                 }

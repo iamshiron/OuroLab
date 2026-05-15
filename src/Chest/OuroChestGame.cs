@@ -117,6 +117,8 @@ public sealed class OuroChestGame : IGame {
         return _revealed[index];
     }
 
+    public bool IsVisible(int index) => IsRevealed(index);
+
     public Sphere GetRevealedSphere(int index) {
         ValidateIndex(index);
         if (!_revealed[index])

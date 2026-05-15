@@ -11,6 +11,7 @@
     <ProjectReference Include="..\Chest\Shiron.OuroLab.Chest.csproj" />
     <ProjectReference Include="..\Core\Shiron.OuroLab.Core.csproj" />
     <ProjectReference Include="..\Harvest\Shiron.OuroLab.Harvest.csproj" />
+    <ProjectReference Include="..\Quest\Shiron.OuroLab.Quest.csproj" />
     <ProjectReference Include="..\Solvers\Shiron.OuroLab.Solvers.csproj" />
   </ItemGroup>
 

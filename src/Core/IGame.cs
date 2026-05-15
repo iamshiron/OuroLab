@@ -11,6 +11,7 @@ public interface IGame {
     IReadOnlyDictionary<Sphere, double> GetPossibleSpheres(int index);
     Sphere Reveal(int index);
     bool IsRevealed(int index);
+    bool IsVisible(int index);
     Sphere GetRevealedSphere(int index);
 
     bool IsSolved { get; }
