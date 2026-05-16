@@ -113,23 +113,31 @@ internal sealed class BenchmarkCommand : AsyncCommand<BenchmarkCommand.Settings>
         string[] games, string[] solvers, int iterations, int threads) {
         var results = new List<(string, string, BenchmarkResult)>();
 
-        AnsiConsole.Status()
-            .Spinner(Spinner.Known.Dots)
-            .Start("Running benchmarks...", ctx => {
+        AnsiConsole.Progress()
+            .Columns(new ProgressColumn[] {
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new PercentageColumn(),
+                new RemainingTimeColumn(),
+            })
+            .Start(ctx => {
                 foreach (var gameName in games) {
                     foreach (var solverName in solvers) {
                         if (!Registry.IsCompatible(gameName, solverName)) continue;
 
-                        ctx.Status($"Running [green]{gameName}[/] + [yellow]{solverName}[/] ([grey]{iterations} iterations, {threads} thread(s)[/])...");
+                        var task = ctx.AddTask($"[green]{gameName}[/] + [yellow]{solverName}[/]");
+                        task.MaxValue = iterations;
 
                         var benchmark = new Benchmark {
                             GameFactory = Registry.Games[gameName],
                             SolverFactory = Registry.Solvers[solverName],
                             Iterations = iterations,
                             MaxDegreeOfParallelism = threads,
+                            OnProgress = completed => task.Value = completed,
                         };
 
                         results.Add((gameName, solverName, benchmark.Run()));
+                        task.Value = iterations;
                     }
                 }
             });

@@ -8,11 +8,13 @@ public sealed class Benchmark {
     public required Func<ISolver> SolverFactory { get; init; }
     public required int Iterations { get; init; }
     public int MaxDegreeOfParallelism { get; init; } = 1;
+    public Action<int>? OnProgress { get; init; }
 
     public BenchmarkResult Run() {
         var results = new SolverResult[Iterations];
         var gameNames = new ConcurrentBag<string>();
         var totalSw = Stopwatch.StartNew();
+        var completed = 0;
 
         var options = new ParallelOptions {
             MaxDegreeOfParallelism = MaxDegreeOfParallelism,
@@ -34,6 +36,11 @@ public sealed class Benchmark {
                 GoalHit = goalHit,
                 TheoreticalMaxScore = maxScore,
             };
+
+            if (OnProgress is not null) {
+                var count = Interlocked.Increment(ref completed);
+                OnProgress(count);
+            }
         });
 
         totalSw.Stop();

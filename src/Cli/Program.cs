@@ -5,9 +5,11 @@ using Shiron.OuroLab.Quest;
 using Shiron.OuroLab.Solvers;
 using Spectre.Console.Cli;
 
-Registry.RegisterGame("ouro-chest", () => new OuroChestGame(), "greedy-ev", "goal-hunter", "info-gain", "random", "expectimax", "cached-expectimax");
-Registry.RegisterGame("ouro-quest", () => new OuroQuestGame(), "greedy-ev", "goal-hunter", "info-gain", "random", "expectimax", "cached-expectimax");
-Registry.RegisterSolver("greedy-ev", () => new GreedyEVSolver());
+Registry.RegisterGame("ouro-chest", () => new OuroChestGame(), "greedy-ev", "greedy-ev-1", "greedy-ev-2", "goal-hunter", "info-gain", "random", "expectimax", "cached-expectimax");
+Registry.RegisterGame("ouro-quest", () => new OuroQuestGame(), "greedy-ev", "greedy-ev-1", "greedy-ev-2", "goal-hunter", "info-gain", "random", "expectimax", "cached-expectimax");
+Registry.RegisterSolver("greedy-ev", () => new GreedyEVLookaheadSolver(0));
+Registry.RegisterSolver("greedy-ev-1", () => new GreedyEVLookaheadSolver(1));
+Registry.RegisterSolver("greedy-ev-2", () => new GreedyEVLookaheadSolver(2));
 Registry.RegisterSolver("goal-hunter", () => new GoalHunterSolver());
 Registry.RegisterSolver("info-gain", () => new InfoGainSolver());
 Registry.RegisterSolver("random", () => new RandomSolver());
