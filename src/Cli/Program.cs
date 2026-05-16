@@ -22,6 +22,7 @@ app.Configure(c => {
     c.AddCommand<BenchmarkCommand>("benchmark");
     c.AddCommand<GenerateCommand>("generate");
     c.AddCommand<PlayCommand>("play");
+    c.AddCommand<TestCommand>("test");
 });
 
 await app.RunAsync(args);

@@ -139,6 +139,18 @@ public sealed class OuroChestGame : IGame {
         _clicksConsumed++;
     }
 
+    public OuroChestGame(Board board, int maxClicks) {
+        Rows = board.Rows;
+        Columns = board.Columns;
+        _maxClicks = maxClicks;
+        _random = Random.Shared;
+        _valueConverter = new OuroChestValueConverter();
+        _board = Board.FromArray(board.ToArray(), board.Rows, board.Columns);
+        _revealed = new bool[Rows * Columns];
+        _revealedCount = 0;
+        _clicksConsumed = 0;
+    }
+
     private OuroChestGame(OuroChestGame other) {
         Rows = other.Rows;
         Columns = other.Columns;

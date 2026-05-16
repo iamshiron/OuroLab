@@ -190,6 +190,27 @@ public sealed class OuroQuestGame : IGame {
         }
     }
 
+    public OuroQuestGame(Board board, int maxClicks, HashSet<int> purpleIndices) {
+        ArgumentOutOfRangeException.ThrowIfLessThan(purpleIndices.Count, 2);
+
+        Rows = board.Rows;
+        Columns = board.Columns;
+        _purpleCount = purpleIndices.Count;
+        _maxClicks = maxClicks;
+        _random = Random.Shared;
+        _valueConverter = new OuroQuestValueConverter();
+        ComputeNeighborMasks();
+        _board = Board.FromArray(board.ToArray(), board.Rows, board.Columns);
+        _revealed = new bool[Rows * Columns];
+        _revealedCount = 0;
+        _clicksConsumed = 0;
+        _revealedPurples = 0;
+        _redCollected = false;
+        _autoRevealedRedIndex = -1;
+        _purpleIndices = purpleIndices;
+        _probabilityCache = null;
+    }
+
     private OuroQuestGame(OuroQuestGame other) {
         Rows = other.Rows;
         Columns = other.Columns;
